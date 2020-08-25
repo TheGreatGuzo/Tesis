@@ -11,5 +11,6 @@
     <!-- more default parameters can be changed here -->
   </include>
 
+  <node name="rviz" pkg="rviz" type="rviz"/>
 </launch>
 	
