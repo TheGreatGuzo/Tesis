@@ -1,0 +1,26 @@
+<sdf version='1.6'>
+  <world name='default'>
+    <include>
+      <uri>model://ground_plane</uri>
+      <pose> 0 0 -.0001 0 0 0 </pose>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    
+    <include>
+      <uri>model://justina_simple</uri>
+      <pose> 0 0 0.05 0 0 0 </pose>
+    </include>
+
+    <include>
+      <uri>model://kitchen_table</uri>
+      <pose> 2  0.8 0   0 0 0 </pose>
+    </include>
+    <include>
+      <uri>model://high_shelf</uri>
+      <pose> 2 -0.8 0   0 0 3.141592 </pose>
+    </include>
+  </world>
+</sdf>

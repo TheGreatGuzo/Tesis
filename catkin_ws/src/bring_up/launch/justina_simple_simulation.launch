@@ -1,0 +1,13 @@
+<launch>
+  <node name="base_kinect_tf" pkg="tf" type="static_transform_publisher" args="0 0 1 -1.5708 0 -1.5708 base_link kinect_link 20"/>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="true"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="debug" value="false"/>
+    <arg name="world_name" value="$(find gazebo_simulation)/worlds/justina_simple.world"/>
+  </include>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find bring_up)/rviz/justina_simple_simulation.rviz"/>
+</launch>
+	
