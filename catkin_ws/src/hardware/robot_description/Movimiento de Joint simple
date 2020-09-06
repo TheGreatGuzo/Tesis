@@ -1,0 +1,8 @@
+rosservice call /gazebo/apply_joint_effort "joint_name: 'la_4_joint'
+effort: 0.3
+start_time:
+  secs: 0
+  nsecs: 0
+duration:
+  secs: 5
+  nsecs: 0"
