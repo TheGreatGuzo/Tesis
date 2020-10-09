@@ -46,7 +46,7 @@ def goal_position(actual_link_position):
 
 #Main, here i call the functions i'm using
 if __name__=="__main__":
-	int eff = 0
+	#int eff = 0		#int to increase the effort 
 	rospy.init_node("read_position")
 	rate = rospy.Rate(2) #Rate of 2hz
 	
