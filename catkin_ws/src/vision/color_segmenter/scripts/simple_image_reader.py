@@ -43,30 +43,43 @@ def callback_rgb_raw(msg):
 
 def centers(mask_yellow,mask_orange):
     #Here i find the average between the points in the frame and calculate the center
+    point_cloud = rospy.wait_for_message("/kinect/points", PointCloud2)
+    xyz = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(point_cloud, remove_nans=False)
     nonzero_yellow = cv2.findNonZero(mask_yellow)
-    nonzero_yellow = nonzero_yellow[:,0]
-    center_xye = numpy.mean(nonzero_yellow[:,0])
-    center_yye = numpy.mean(nonzero_yellow[:,1])
+    #print len(nonzero_yellow)
+    #print xyz[nonzero_yellow[5000][0][1],nonzero_yellow[5000][0][0]]
+    meanx = 0
+    meany = 0
+    meanz = 0
+    counter = 0
+    for ij in nonzero_yellow:
+        [x,y,z] = xyz[ij[0][1],ij[0][0]]
+        if not math.isnan(x) and not math.isnan(y) and not math.isnan(z):
+            meanx+=x
+            meany+=y
+            meanz+=z
+            counter+=1
+    meanx/=counter
+    meany/=counter
+    meanz/=counter
+    print [meanx,meany,meanz]
 
     nonzero_orange = cv2.findNonZero(mask_orange)
-    nonzero_orange = nonzero_orange[:,0]
-    center_xor = numpy.mean(nonzero_orange[:,0])
-    center_yor = numpy.mean(nonzero_orange[:,1])
 
     pub_point = rospy.Publisher('/object_position', PointStamped, queue_size=1)
     msg_point = PointStamped()
     msg_point.header.stamp = rospy.Time.now()
     msg_point.header.frame_id = "kinect_link"
-    msg_point.point.x = center_xor/1280
-    msg_point.point.y = 0.0
-    msg_point.point.z = 0.5
+    msg_point.point.x = meanx
+    msg_point.point.y = meany
+    msg_point.point.z = meanz
     pub_point.publish(msg_point)
     #print(xyz.shape)
 
 
 def callback_point_cloud(msg):
     xyz = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(msg, remove_nans=False)
-    print(xyz.shape)
+    #print(xyz.shape)
 
 
 def main():
@@ -83,4 +96,3 @@ if __name__ == "__main__":
         main()
     except rospy.exceptions.ROSInterruptException:
         pass
-
