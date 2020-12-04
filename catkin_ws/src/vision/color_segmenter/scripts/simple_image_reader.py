@@ -6,10 +6,11 @@ import cv2
 import cv_bridge
 import numpy
 import math
+import tf
+from tf import TransformListener
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PointStamped
-
 
 def callback_rgb_raw(msg):
     bridge = cv_bridge.CvBridge()
@@ -17,8 +18,8 @@ def callback_rgb_raw(msg):
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
 
     #Here we do the segmentation for the yellow color
-    lower_yellow = numpy.array([30,240,125]) 
-    upper_yellow = numpy.array([40,255,255]) 
+    lower_yellow = numpy.array([25,240,125]) 
+    upper_yellow = numpy.array([35,255,255]) 
     mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow) 
 
     #Here we do the segmentation for the orange color
@@ -35,7 +36,7 @@ def callback_rgb_raw(msg):
     #cv2.imshow('mask_orange',mask_orange)
     #cv2.imshow('resorange',resorange)
     #cv2.imshow('resyellow',resyellow)
-    cv2.imshow('res',resfinal)
+    #cv2.imshow('res',resfinal)
     #cv2.imshow("Image BGR", img_bgr)
 
     centers(mask_yellow,mask_orange)
@@ -62,9 +63,9 @@ def centers(mask_yellow,mask_orange):
     meanx/=counter
     meany/=counter
     meanz/=counter
-    print [meanx,meany,meanz]
+    #print [meanx,meany,meanz]
 
-    nonzero_orange = cv2.findNonZero(mask_orange)
+    #nonzero_orange = cv2.findNonZero(mask_orange)
 
     pub_point = rospy.Publisher('/object_position', PointStamped, queue_size=1)
     msg_point = PointStamped()
@@ -75,7 +76,42 @@ def centers(mask_yellow,mask_orange):
     msg_point.point.z = meanz
     pub_point.publish(msg_point)
     #print(xyz.shape)
+    transx = meanx
+    transy = meany
+    transz = meanz
+    transform_point(transx, transy, transz)
 
+    #Transform the coordinates with different frames as base
+def transform_point(transx, transy, transz):
+    #Object position with the left shoulder frame as base
+    tl = tf.TransformListener()
+    newp = PointStamped() 
+    newp.header.stamp = rospy.Time.now()
+    newp.header.frame_id = "kinect_link"
+    newp.point.x = transx
+    newp.point.y = transy
+    newp.point.z = transz
+
+    
+    tl.waitForTransform("kinect_link","shoulders_left_link",rospy.Time(),rospy.Duration(4.0))
+    left_transform = tl.transformPoint("shoulders_left_link",newp)
+    new_point_lsh = rospy.Publisher('/object_position_la', PointStamped, queue_size=1)
+    new_point_lsh.publish(left_transform)
+    #print left_transform
+
+    #Object position with the right shoulder frame as base
+    tl.waitForTransform("kinect_link","shoulders_right_link",rospy.Time(),rospy.Duration(4.0))
+    right_transform = tl.transformPoint("shoulders_right_link",newp)
+    new_point_rsh = rospy.Publisher('/object_position_ra', PointStamped, queue_size=1)
+    new_point_rsh.publish(right_transform)
+    #print right_transform
+
+    #Object position with the base link frame as base
+    tl.waitForTransform("kinect_link","base_link",rospy.Time(),rospy.Duration(4.0))
+    base_transform = tl.transformPoint("base_link",newp)
+    new_point_b = rospy.Publisher('/object_position_b', PointStamped, queue_size=1)
+    new_point_b.publish(base_transform)
+    #print base_transform
 
 def callback_point_cloud(msg):
     xyz = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(msg, remove_nans=False)

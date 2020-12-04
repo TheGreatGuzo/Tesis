@@ -38,7 +38,10 @@
               <threshold>0</threshold>
             </bounce>
             <friction>
-              <ode/>
+              <ode>
+              	<mu>0.2</mu>
+            	  <mu2>0.587</mu2>
+              </ode>
             </friction>
             <contact>
               <ode>

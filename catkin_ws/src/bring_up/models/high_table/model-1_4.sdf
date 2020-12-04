@@ -38,9 +38,10 @@
           <max_contacts>10</max_contacts>
           <surface>
             <bounce/>
-            <friction>
-              <ode/>
-            </friction>
+            <ode>
+                <mu>0.25</mu>
+                <mu2>12.2</mu2>
+              </ode>
             <contact>
               <ode/>
             </contact>
