@@ -6,10 +6,10 @@
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
     <arg name="debug" value="false"/>
-    <arg name="world_name" value="$(find bring_up)/worlds/only_appartment.world"/>
+    <arg name="world_name" value="$(find bring_up)/worlds/only_appartment_simple.world"/>
   </include>
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="screen"
-        args="-param robot_description -urdf -model justina -x 11.0 -y 11.2 -z 0.03 -Y 3.141592"/>
+        args="-param robot_description -urdf -model justina -x 1.1 -y 1.89 -z 0.03 -Y 3.141592"/>
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find bring_up)/rviz/justina.rviz"/>
   <node name="simple_gui" pkg="simple_gui" type="simple_gui_node"/>
   <node name="mobile_base" pkg="mobile_base_simul" type="mobile_base_simul.py" output="screen"/>
